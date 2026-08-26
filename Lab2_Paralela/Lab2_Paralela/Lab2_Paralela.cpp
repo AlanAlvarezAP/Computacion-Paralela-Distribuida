@@ -6,7 +6,7 @@
 
 #define NUM_PRUEBAS 10
 
-typedef double (*func) (int N,std::vector<std::vector<double>>& vec);
+typedef void (*func) (int N,std::vector<std::vector<double>>& vec);
 
 enum Type {
 	COL,
@@ -40,60 +40,36 @@ void FillMatrix(int N,std::vector<std::vector<double>>& vec){
 	}
 }
 
-double IterRows(int N,std::vector<std::vector<double>>& vec) {
-	auto inicio = std::chrono::high_resolution_clock::now();
+void IterRows(int N,std::vector<std::vector<double>>& vec) {
 	for (int i = 0;i < N;i++) {
 		for (int j = 0;j < N;j++) {
 			vec[i][j] *= 2.0;
 		}
 	}	
-	auto fin = std::chrono::high_resolution_clock::now();
-	double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
-	std::cout << "Tiempo al iterar por filas -> " << tiempo << "s" << std::endl;
-
-	return tiempo;
 }
 
-double IterCols(int N,std::vector<std::vector<double>>& vec) {
-	auto inicio = std::chrono::high_resolution_clock::now();
+void IterCols(int N,std::vector<std::vector<double>>& vec) {
 	for (int j = 0; j < N; j++) {
 		for (int i = 0; i < N; i++) {
 			vec[i][j] *= 2.0;
 		}
 	}
-	auto fin = std::chrono::high_resolution_clock::now();
-	double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
-	std::cout << "Tiempo al iterar por columnas -> " << tiempo << "s" << std::endl;
-	
-	return tiempo;
 }
 
-double LocTmpA(int N, std::vector<std::vector<double>>& vec) {
-	auto inicio = std::chrono::high_resolution_clock::now();
+void LocTmpA(int N, std::vector<std::vector<double>>& vec) {
 	for (int i = 0;i < N;i++) {
 		vec[i][0] += 1;
 		vec[i][0] += 1;
 		vec[i][0] += 1;
 	}
-	auto fin = std::chrono::high_resolution_clock::now();
-	double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
-	std::cout << "Tiempo a localidad temporal patron A -> " << tiempo << "s" << std::endl;
-
-	return tiempo;
 }
 
-double LocTmpB(int N, std::vector<std::vector<double>>& vec) {
-	auto inicio = std::chrono::high_resolution_clock::now();
+void LocTmpB(int N, std::vector<std::vector<double>>& vec) {
 	for (int k = 0;k < 3;k++) {
 		for (int i = 0;i < N;i++) {
 			vec[i][0] += 1;
 		}
 	}
-	auto fin = std::chrono::high_resolution_clock::now();
-	double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
-	std::cout << "Tiempo a localidad temporal patron B -> " << tiempo << "s" << std::endl;
-
-	return tiempo;
 }
 
 void SetUp(int N,std::vector<std::vector<double>>& vec,Type tipe,func funcion) {
@@ -104,7 +80,13 @@ void SetUp(int N,std::vector<std::vector<double>>& vec,Type tipe,func funcion) {
 	std::cout << std::string(40, '=') << std::endl;
 	std::cout << " Comenzando ejecucion de " << type << " | N = " << N << std::endl;
 	for (int i = 0;i < NUM_PRUEBAS;i++) {
-		media += funcion(N,vec);
+		auto inicio = std::chrono::high_resolution_clock::now();
+		funcion(N,vec);
+		auto fin = std::chrono::high_resolution_clock::now();
+		double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
+		media += tiempo;
+
+		std::cout << "Tiempo a " << type << " -> " << tiempo << "s" << std::endl;
 	}
 	std::cout << "Media de tiempo "<< type << " -> " << media / NUM_PRUEBAS << "s" << std::endl;
 	std::cout << std::string(40, '=') << std::endl << std::endl;
@@ -116,11 +98,14 @@ void SetUp(int N,std::vector<std::vector<double>>& vec,Type tipe,func funcion) {
 int main(){
 	std::vector<std::vector<double>> vec;
 
+	// Prueba Parte B
+	FillMatrix(20000, vec);
+
 	// Prueba Parte C
 	SetUp(20000, vec, FIL, &IterRows);
 
 	// Prueba Parte D
-	SetUp(20000, vec, COL, &IterRows);
+	SetUp(20000, vec, COL, &IterCols);
 
 	// Pruebas para filas
 	SetUp(100,vec, FIL, &IterRows);
@@ -142,6 +127,8 @@ int main(){
 
 	//Patrones temporales local A
 	SetUp(10000, vec, LOCAL_TEMP_A, &LocTmpA);
+
+	//Patrones temporales local B
 	SetUp(10000, vec, LOCAL_TEMP_B, &LocTmpB);
 }
 
