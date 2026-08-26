@@ -83,12 +83,12 @@ void SetUp(int N,std::vector<std::vector<double>>& vec,Type tipe,func funcion) {
 		auto inicio = std::chrono::high_resolution_clock::now();
 		funcion(N,vec);
 		auto fin = std::chrono::high_resolution_clock::now();
-		double tiempo = (std::chrono::duration<double>(fin - inicio)).count();
+		double tiempo = (std::chrono::duration<double,std::milli>(fin - inicio)).count();
 		media += tiempo;
 
-		std::cout << "Tiempo a " << type << " -> " << tiempo << "s" << std::endl;
+		std::cout << "Tiempo a " << type << " -> " << tiempo << "ms" << std::endl;
 	}
-	std::cout << "Media de tiempo "<< type << " -> " << media / NUM_PRUEBAS << "s" << std::endl;
+	std::cout << "Media de tiempo "<< type << " -> " << media / NUM_PRUEBAS << "ms" << std::endl;
 	std::cout << std::string(40, '=') << std::endl << std::endl;
 
 }
@@ -126,9 +126,9 @@ int main(){
 
 
 	//Patrones temporales local A
-	SetUp(10000, vec, LOCAL_TEMP_A, &LocTmpA);
+	SetUp(20000, vec, LOCAL_TEMP_A, &LocTmpA);
 
 	//Patrones temporales local B
-	SetUp(10000, vec, LOCAL_TEMP_B, &LocTmpB);
+	SetUp(20000, vec, LOCAL_TEMP_B, &LocTmpB);
 }
 
